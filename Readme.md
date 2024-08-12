@@ -11,6 +11,36 @@ This project is a comprehensive backend system built with Node.js, Express.js, M
 - **Parking Management**: CRUD operations for parking levels, parking spaces, and parking transactions.
 - **User and Admin Routes**: Respective user and admin role based API response.
 
+## Schema Definitions
+
+### Parking Level
+- **title**: `String`, required, unique, trimmed
+
+### Parking Space
+- **parkingTransactionId**: `ObjectId`, reference to `ParkingTransaction`, default: `null`
+- **type**: `String`, required, enum: ['2-wheeler', '4-wheeler']
+- **parkingLevelId**: `ObjectId`, reference to `ParkingLevel`, required
+- **isAvailable**: `Boolean`, default: `true`
+
+### Parking Transaction
+- **parkingLevelId**: `ObjectId`, reference to `ParkingLevel`, required
+- **type**: `String`, required, enum: ['2-wheeler', '4-wheeler']
+- **parkingSpaceId**: `ObjectId`, reference to `ParkingSpace`, required
+- **bookingDateTime**: `Date`, required
+- **releaseDateTime**: `Date`
+- **vehicleNo**: `String`, required, trimmed
+- **userId**: `ObjectId`, reference to `User`, required
+- **fees**: `Number`
+
+### User
+- **username**: `String`, required, unique, lowercase, trimmed
+- **email**: `String`, required, unique, lowercase, trimmed
+- **fullName**: `String`, required, trimmed
+- **password**: `String`, required
+- **role**: `String`, enum: ['admin', 'user'], default: 'user'
+- **refreshToken**: `String`
+
+
 ## API Endpoints
 
 ### Parking Levels
@@ -50,7 +80,7 @@ This project is a comprehensive backend system built with Node.js, Express.js, M
 
 2. **Get Parking Transaction By ID**
    - **Endpoint**: `GET /api/v1/parking-transactions/:id`
-   - **Description**: Retrieves a single parking transaction by its ID.
+   - **Description**: Retrieves a single parking transaction by its ID and restricted by **role (user or admin)**.
 
 3. **Create Parking Transaction**
    - **Endpoint**: `POST /api/v1/parking-transactions`
@@ -60,7 +90,7 @@ This project is a comprehensive backend system built with Node.js, Express.js, M
      - `parkingSpaceId`: ID of the parking space.
      - `bookingDateTime`: Date and time of booking.
      - `vehicleNo`: Vehicle number.
-   - **Description**: Creates a new parking transaction.
+   - **Description**: Creates a new parking transaction only by role: user.
 
 4. **Release Parking Transaction**
    - **Endpoint**: `PATCH /api/v1/parking-transactions/:id`
@@ -90,7 +120,7 @@ This project is a comprehensive backend system built with Node.js, Express.js, M
    - **Description**: Logs out the current user by invalidating the access and refresh tokens.
 
 4. **Refresh Access Token**
-   - **Endpoint**: `POST /api/V1/users/refresh`
+   - **Endpoint**: `POST /api/V1/users/efresh-token`
    - **Cookies**: `refreshToken`
    - **Description**: Refreshes the access token using the refresh token provided in cookies.
 
@@ -102,11 +132,11 @@ This project is a comprehensive backend system built with Node.js, Express.js, M
    - **Description**: Changes the current password for the authenticated user.
 
 6. **Get Current User**
-   - **Endpoint**: `GET /api/V1/users/me`
+   - **Endpoint**: `GET /api/V1/users/current-user`
    - **Description**: Retrieves the details of the currently authenticated user.
 
 7. **Update Account Details**
-   - **Endpoint**: `PUT /api/V1/users/me`
+   - **Endpoint**: `PUT /api/V1/users/update-account`
    - **Body Parameters**:
      - `fullName` (optional): Updated full name.
      - `email` (optional): Updated email address.
