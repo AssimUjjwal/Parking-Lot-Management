@@ -37,7 +37,7 @@ export const getParkingTransactionById = async (req, res) => {
 export const createParkingTransaction = async (req, res) => {
     try {
         const { parkingLevelId, type, parkingSpaceId, bookingDateTime, vehicleNo } = req.body;
-        const { _id: userId, role } = req.user._id;
+        const { _id: userId, role } = req.user;
 
         if (role === 'admin') {
             return res.status(403).json({ message: "Admins are not allowed to create parking transactions" });
@@ -64,6 +64,7 @@ export const createParkingTransaction = async (req, res) => {
 
         parkingSpace.isAvailable = false;
         parkingSpace.parkingTransactionId = savedTransaction._id;
+        await parkingSpace.save();
 
         res.status(201).json(newParkingTransaction);
     } catch (err) {
@@ -89,7 +90,7 @@ export const releaseParkingTransaction = async (req, res) => {
         parkingSpace.parkingTransactionId = null;
 
         await parkingSpace.save();
-        res.json(parkingTransaction);
+        res.status(201).json(parkingTransaction);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
